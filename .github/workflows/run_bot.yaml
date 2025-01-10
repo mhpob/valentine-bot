@@ -36,4 +36,4 @@ jobs:
           
     - name: Make post
       run: |
-        Rscript valentine-bot.R BSKY_PAT
+        Rscript valentine-bot.R
