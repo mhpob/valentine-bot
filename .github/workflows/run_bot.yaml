@@ -33,6 +33,7 @@ jobs:
           any::httr2
           any::rvest
           any::atrrr
+          any::magick
           
     - name: Make post
       run: |
