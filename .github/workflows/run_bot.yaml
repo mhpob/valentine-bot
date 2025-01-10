@@ -1,14 +1,9 @@
-# adapted from:
-# <https://github.com/gadenbuie/mynorfolk-dash/blob/main/.github/workflows/build-dash.yaml>
 on:
   schedule:
       - cron: "0 */4 * * *"
   workflow_dispatch:
 
 name: post-skeet
-
-permissions:
-  contents: write
 
 jobs:
   post-skeet:
