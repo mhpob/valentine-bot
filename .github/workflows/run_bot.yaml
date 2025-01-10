@@ -1,0 +1,39 @@
+# adapted from:
+# <https://github.com/gadenbuie/mynorfolk-dash/blob/main/.github/workflows/build-dash.yaml>
+on:
+  schedule:
+      - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+name: post-skeet
+
+permissions:
+  contents: write
+
+jobs:
+  build-dash:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      BSKY_PAT: ${{ secrets.BSKY_TOKEN }}
+    steps:
+
+    - name: Check out repository
+      uses: actions/checkout@v4
+
+    - name: Set up R
+      uses: r-lib/actions/setup-r@v2
+      with:
+        use-public-rspm: true
+
+    - name: Set up R packages
+      uses: r-lib/actions/setup-r-dependencies@v2
+      with:
+        packages:
+          any::httr2
+          any::rvest
+          any::atrrr
+          
+    - name: Make post
+      run: |
+        Rscript valentine-bot.R BSKY_PAT
