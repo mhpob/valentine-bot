@@ -132,8 +132,8 @@ item <- "https://valentine.rediscoverysoftware.com/ProficioWcfServices/ProficioW
 if(dir == "VALCOLL"){
   item_info <- data.frame(
     id = extract_tag(item, 'cat_nbr'),
+    title = extract_tag(item, "cat_nam"),
     file_name = extract_tag(item, "file_name"),
-    category = extract_tag(item, "cat_nam"),
     date = extract_tag(item, "categ_16"),
     creator = extract_tag(item, "artist"),
     description = extract_tag(item, "obj_mem"),
@@ -187,7 +187,7 @@ paste0(
   browseURL()
 
 
-### update below
+### Skeet it
 
 auth(
   user = 'thevalentinebot.bsky.social',
@@ -195,12 +195,16 @@ auth(
 )
 post(
   text = paste0(
-    "Cat #: ",
-    item_info$id,
-    "\nDate: ",
-    item_info$date,
-    "\nArtist: ",
-    item_info$creator,
+    "ID: ", item_info$id,
+    ifelse(item_info$title != "", paste0("\n",item_info$title), ""),
+    ifelse(item_info$date != "",
+           paste0("\nDate: ", item_info$date),
+           ""
+    ),
+    ifelse(item_info$creator != "",
+      paste0("\nArtist: ", item_info$creator),
+      ""
+    ),
     "\n",
     paste0("https://valentine.rediscoverysoftware.com/",
            ifelse(dir == "VALCOLL", "mDetail", "MADetailB"),
