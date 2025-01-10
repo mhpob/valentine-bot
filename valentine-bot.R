@@ -1,3 +1,5 @@
+bsky_pat <- commandArgs(trailingOnly = TRUE)
+
 library(httr2)
 library(rvest)
 library(atrrr)
@@ -90,7 +92,7 @@ image_info <- data.frame(
 
 auth(
   user = 'thevalentinebot.bsky.social',
-  password = SECRET HERE
+  password = bsky_pat
 )
 post(
   text = paste0(
