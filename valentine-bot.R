@@ -4,6 +4,12 @@ library(httr2)
 library(rvest)
 library(atrrr)
 
+extract_tag <- function(html, tag){
+  html |> 
+    html_elements(tag) |> 
+    html_text()
+}
+
 n_objects <- request('https://valentine.rediscoverysoftware.com/ProficioWcfServices/ProficioWcfService.svc/FindItXmlStringPageCount') |> 
   req_body_json(
     list(Words = "*",
