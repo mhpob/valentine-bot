@@ -213,7 +213,8 @@ post(
            "&db=",
            ifelse(dir == "VALCOLL", 'objects', 'biblio'),
            "&dir=",
-           dir)
+           dir) |>
+    URLencode()
   ),
   image = paste0(
     "https://valentine.rediscoverysoftware.com/FullImages",
