@@ -165,26 +165,27 @@ images <- 'https://valentine.rediscoverysoftware.com/ProficioWcfServices/Profici
   read_html()
 
 image_info <- data.frame(
-  image_path = extract_tag(images, "fullimage")
+  image_path = extract_tag(images, "fullimage") |> 
+    gsub("\\\\", "/", x = _)
 )
 
+## Uncomment for interactive checks
+# paste0("https://valentine.rediscoverysoftware.com/",
+#        ifelse(dir == "VALCOLL", "mDetail", "MADetailB"),
+#        ".aspx?rID=",
+#        item_info$id,
+#        "&db=",
+#        ifelse(dir == "VALCOLL", 'objects', 'biblio'),
+#        "&dir=",
+#        dir) |> 
+#   browseURL()
+# 
+# paste0(
+#   "https://valentine.rediscoverysoftware.com/FullImages",
+#   image_info$image_path[sample(1:length(image_info$image_path), 1)]) |> 
+#   URLencode() |> 
+#   browseURL()
 
-
-
-paste0("https://valentine.rediscoverysoftware.com/",
-       ifelse(dir == "VALCOLL", "mDetail", "MADetailB"),
-       ".aspx?rID=",
-       item_info$id,
-       "&db=",
-       ifelse(dir == "VALCOLL", 'objects', 'biblio'),
-       "&dir=",
-       dir) |> 
-  browseURL()
-
-paste0(
-  "https://valentine.rediscoverysoftware.com/FullImages",
-  image_info$image_path[sample(1:length(image_info$image_path), 1)]) |> 
-  browseURL()
 
 
 ### Skeet it
@@ -218,6 +219,7 @@ post(
   ),
   image = paste0(
     "https://valentine.rediscoverysoftware.com/FullImages",
-    image_info$image_path[sample(1:length(image_info$image_path))]),
+    image_info$image_path[sample(1:length(image_info$image_path), 1)]) |> 
+    URLencode(),
   image_alt = item_info$description
 )
