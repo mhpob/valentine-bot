@@ -52,8 +52,9 @@ catalog <- request("https://valentine.rediscoverysoftware.com/ProficioWcfService
 if(dir == "VALARCH"){
   catalog <- catalog[grepl("PHC", catalog)]
   indiv_box <- NULL
+  image_check <- ""
   
-  while(length(indiv_box) == 0){
+  while(length(indiv_box) == 0 & image_check == ""){
     collection <- sample(catalog, 1)
     box_list <- 'https://valentine.rediscoverysoftware.com/ProficioWcfServices/ProficioWcfService.svc/GetArchivalChildren' |> 
       request() |> 
@@ -96,11 +97,32 @@ if(dir == "VALARCH"){
       }
     }
     
-    ids <- indiv_box |>
+    ids <- data.frame(
+      id = indiv_box |>
       html_elements(xpath ='//archivalnumber') |>
-      html_text()
+      html_text(),
+      file_name = indiv_box |>
+        html_elements(xpath ='//filename') |>
+        html_text()
+    )
     
-    item_id <- sample(ids, 1)
+    item_id <- ids[sample(1:nrow(ids), 1),]
+    
+    
+    image_check <- 'https://valentine.rediscoverysoftware.com/ProficioWcfServices/ProficioWcfService.svc/GetImagePaths'|> 
+      request() |> 
+      req_body_json(
+        list(
+          Directory = dir,
+          ImageKey = item_id$file_name,
+          FieldList="imagedescription"
+        )
+      ) |> 
+      req_perform() |> 
+      resp_body_json() |> 
+      _$d 
+    
+    item_id <- item_id$id
   }
 } else {
   item_id <- sample(catalog, 1)
