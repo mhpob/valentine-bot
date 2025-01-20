@@ -150,6 +150,9 @@ if(dir == "VALCOLL"){
   )
 }
 
+## Print for possible debugging
+print(item_info$id)
+
 images <- 'https://valentine.rediscoverysoftware.com/ProficioWcfServices/ProficioWcfService.svc/GetImagePaths'|> 
   request() |> 
   req_body_json(
@@ -177,7 +180,7 @@ image_info <- data.frame(
 #        "&db=",
 #        ifelse(dir == "VALCOLL", 'objects', 'biblio'),
 #        "&dir=",
-#        dir) |> 
+#        dir) |>
 #   browseURL()
 # 
 # paste0(
@@ -194,7 +197,27 @@ auth(
   user = 'thevalentinebot.bsky.social',
   password = Sys.getenv("BSKY_PAT")
 )
-post(
+
+
+## temporary workaround until atrrr (hopefully) allows posting images from urls
+
+for (i in 1:nrow(image_info)) {
+  url <- paste0(
+    "https://valentine.rediscoverysoftware.com/FullImages",
+    image_info$image_path[i]) |>
+    URLencode()
+  
+  image_info$image_path_local[i] <- paste0("img", i, ".", tools::file_ext(url))
+  
+  download.file(
+    url,
+    destfile = image_info$image_path_local[i],
+    mode = "wb"
+  )
+}
+
+
+post_skeet(
   text = paste0(
     "ID: ", item_info$id,
     ifelse(item_info$title != "", paste0("\n",item_info$title), ""),
@@ -217,9 +240,6 @@ post(
            dir) |>
     URLencode()
   ),
-  image = paste0(
-    "https://valentine.rediscoverysoftware.com/FullImages",
-    image_info$image_path[sample(1:length(image_info$image_path), 1)]) |> 
-    URLencode(),
-  image_alt = item_info$description
+  image = image_info$image_path_local,
+  image_alt = rep(item_info$description, times = nrow(image_info))
 )
