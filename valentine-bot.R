@@ -107,6 +107,9 @@ if(dir == "VALARCH"){
 }
 
 
+# Print for possible debugging
+print(item_id)
+
 
 item <- "https://valentine.rediscoverysoftware.com/ProficioWcfServices/ProficioWcfService.svc/GetRecordDetails" |> 
   request() |> 
@@ -150,8 +153,9 @@ if(dir == "VALCOLL"){
   )
 }
 
-## Print for possible debugging
-print(item_info$id)
+for (i in 1:ncol(item_info)){
+  item_info[, i] <- gsub("\\s?(--|__)", "; ", x = item_info[, i])
+}
 
 images <- 'https://valentine.rediscoverysoftware.com/ProficioWcfServices/ProficioWcfService.svc/GetImagePaths'|> 
   request() |> 
@@ -176,6 +180,8 @@ image_info$url <- paste0(
     image_info$image_path
   ) |>
   URLencode()
+
+print(image_info)
 
 ## Uncomment for interactive checks
 # paste0("https://valentine.rediscoverysoftware.com/",
@@ -225,8 +231,9 @@ post_skeet(
            ifelse(dir == "VALCOLL", 'objects', 'biblio'),
            "&dir=",
            dir) |>
-    URLencode()
+      URLencode() |> 
+      gsub(",", "%2C", x = _)
   ),
-  image = image_info$image_url,
+  image = image_info$url,
   image_alt = rep(item_info$description, times = nrow(image_info))
 )
