@@ -171,6 +171,11 @@ image_info <- data.frame(
   image_path = extract_tag(images, "fullimage") |> 
     gsub("\\\\", "/", x = _)
 )
+image_info$url <- paste0(
+    "https://valentine.rediscoverysoftware.com/FullImages",
+    image_info$image_path
+  ) |>
+  URLencode()
 
 ## Uncomment for interactive checks
 # paste0("https://valentine.rediscoverysoftware.com/",
@@ -199,24 +204,6 @@ auth(
 )
 
 
-## temporary workaround until atrrr (hopefully) allows posting images from urls
-
-for (i in 1:nrow(image_info)) {
-  url <- paste0(
-    "https://valentine.rediscoverysoftware.com/FullImages",
-    image_info$image_path[i]) |>
-    URLencode()
-  
-  image_info$image_path_local[i] <- paste0("img", i, ".", tools::file_ext(url))
-  
-  download.file(
-    url,
-    destfile = image_info$image_path_local[i],
-    mode = "wb"
-  )
-}
-
-
 post_skeet(
   text = paste0(
     "ID: ", item_info$id,
@@ -240,6 +227,6 @@ post_skeet(
            dir) |>
     URLencode()
   ),
-  image = image_info$image_path_local,
+  image = image_info$image_url,
   image_alt = rep(item_info$description, times = nrow(image_info))
 )
