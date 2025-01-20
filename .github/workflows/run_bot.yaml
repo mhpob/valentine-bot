@@ -27,7 +27,7 @@ jobs:
         packages:
           any::httr2
           any::rvest
-          any::atrrr
+          JBGruber/atrrr
           any::magick
           
     - name: Make post
