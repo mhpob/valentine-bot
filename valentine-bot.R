@@ -205,6 +205,12 @@ image_info$url <- paste0(
 
 print(image_info)
 
+
+# Can only post 4 media items at a time
+if(nrow(image_info) > 4){
+  image_info <- image_info[sample(1:nrow(image_info), 4), ]
+}
+
 ## Uncomment for interactive checks
 # paste0("https://valentine.rediscoverysoftware.com/",
 #        ifelse(dir == "VALCOLL", "mDetail", "MADetailB"),
