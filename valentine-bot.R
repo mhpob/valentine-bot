@@ -209,6 +209,7 @@ print(image_info)
 # Can only post 4 media items at a time
 if(nrow(image_info) > 4){
   image_info <- image_info[sample(1:nrow(image_info), 4), ]
+  image_info <- image_info[order(row.names(image_info)),]
 }
 
 ## Uncomment for interactive checks
