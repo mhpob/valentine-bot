@@ -9,7 +9,10 @@ extract_tag <- function(html, tag){
 }
 
 dir <- sample(c("VALCOLL", "VALARCH"), 1)
+pretty_dir <- ifelse(dir == "VACOLL", "collections", "archives")
 table <- ifelse(dir == "VALCOLL", "objects", "group")
+
+cat("Checking number of objects in ", pretty_dir, "... ", sep = "")
 
 n_objects <- request('https://valentine.rediscoverysoftware.com/ProficioWcfServices/ProficioWcfService.svc/FindItXmlStringPageCount') |> 
   req_body_json(
@@ -25,6 +28,7 @@ n_objects <- request('https://valentine.rediscoverysoftware.com/ProficioWcfServi
   resp_body_json() |> 
   _$d
 
+cat(n_objects, ".\nReading ", pretty_dir, " catalog...", sep = "")
 
 catalog <- request("https://valentine.rediscoverysoftware.com/ProficioWcfServices/ProficioWcfService.svc/FindItXmlStringPage") |> 
   req_body_json(
@@ -48,6 +52,7 @@ catalog <- request("https://valentine.rediscoverysoftware.com/ProficioWcfService
   html_elements(xpath = ifelse(dir == "VALCOLL", '//objects', '//group')) |> 
   html_text()
 
+cat("done.\nSelecting item... ")
 
 if(dir == "VALARCH"){
   catalog <- catalog[grepl("PHC", catalog)]
@@ -99,8 +104,8 @@ if(dir == "VALARCH"){
     
     ids <- data.frame(
       id = indiv_box |>
-      html_elements(xpath ='//archivalnumber') |>
-      html_text(),
+        html_elements(xpath ='//archivalnumber') |>
+        html_text(),
       file_name = indiv_box |>
         html_elements(xpath ='//filename') |>
         html_text()
@@ -128,10 +133,8 @@ if(dir == "VALARCH"){
   item_id <- sample(catalog, 1)
 }
 
-
 # Print for possible debugging
-print(item_id)
-
+cat(item_id, '\nGetting item record...', sep = '')
 
 item <- "https://valentine.rediscoverysoftware.com/ProficioWcfServices/ProficioWcfService.svc/GetRecordDetails" |> 
   request() |> 
@@ -179,6 +182,8 @@ for (i in 1:ncol(item_info)){
   item_info[, i] <- gsub("\\s?(--|__)", "; ", x = item_info[, i])
 }
 
+cat("done.\nFinding image URLs...")
+
 images <- 'https://valentine.rediscoverysoftware.com/ProficioWcfServices/ProficioWcfService.svc/GetImagePaths'|> 
   request() |> 
   req_body_json(
@@ -198,12 +203,12 @@ image_info <- data.frame(
     gsub("\\\\", "/", x = _)
 )
 image_info$url <- paste0(
-    "https://valentine.rediscoverysoftware.com/FullImages",
-    image_info$image_path
-  ) |>
+  "https://valentine.rediscoverysoftware.com/FullImages",
+  image_info$image_path
+) |>
   URLencode()
 
-print(image_info)
+cat('done.\nImage URLs:\n', paste(image_info$url, collapse = "\n"))
 
 
 # Can only post 4 media items at a time
@@ -233,6 +238,8 @@ if(nrow(image_info) > 4){
 
 ### Skeet it
 
+cat("\nPosting to Bluesky...")
+
 auth(
   user = 'thevalentinebot.bsky.social',
   password = Sys.getenv("BSKY_PAT")
@@ -248,8 +255,8 @@ post_skeet(
            ""
     ),
     ifelse(item_info$creator != "",
-      paste0("\nArtist: ", item_info$creator),
-      ""
+           paste0("\nArtist: ", item_info$creator),
+           ""
     ),
     "\n",
     paste0("https://valentine.rediscoverysoftware.com/",
@@ -266,3 +273,5 @@ post_skeet(
   image = image_info$url,
   image_alt = rep(item_info$description, times = nrow(image_info))
 )
+
+cat("done.")
