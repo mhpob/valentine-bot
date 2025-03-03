@@ -182,7 +182,20 @@ for (i in 1:ncol(item_info)){
   item_info[, i] <- gsub("\\s?(--|__)", "; ", x = item_info[, i])
 }
 
-cat("done.\nFinding image URLs...")
+item_url <- paste0(
+  "https://valentine.rediscoverysoftware.com/",
+  ifelse(dir == "VALCOLL", "mDetail", "MADetailB"),
+  ".aspx?rID=",
+  item_info$id,
+  "&db=",
+  ifelse(dir == "VALCOLL", 'objects', 'biblio'),
+  "&dir=",
+  dir
+) |>
+  URLencode() |> 
+  gsub(",", "%2C", x = _)
+
+cat("done.\nItem URL:", item_url, "\nFinding image URLs...")
 
 images <- 'https://valentine.rediscoverysoftware.com/ProficioWcfServices/ProficioWcfService.svc/GetImagePaths'|> 
   request() |> 
@@ -259,16 +272,7 @@ post_skeet(
            ""
     ),
     "\n",
-    paste0("https://valentine.rediscoverysoftware.com/",
-           ifelse(dir == "VALCOLL", "mDetail", "MADetailB"),
-           ".aspx?rID=",
-           item_info$id,
-           "&db=",
-           ifelse(dir == "VALCOLL", 'objects', 'biblio'),
-           "&dir=",
-           dir) |>
-      URLencode() |> 
-      gsub(",", "%2C", x = _)
+    item_url
   ),
   image = image_info$url,
   image_alt = rep(item_info$description, times = nrow(image_info))
