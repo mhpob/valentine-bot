@@ -38,6 +38,10 @@ write.csv(n_objects,
           row.names = FALSE)
 
 if(new_coll != 0 | new_arch != 0){
+  write.csv(n_objects,
+            "data/n_digitized.csv",
+            row.names = FALSE)
+  
   if (new_coll != 0 & new_arch != 0) {
     txt <- paste0(
       new_coll,
