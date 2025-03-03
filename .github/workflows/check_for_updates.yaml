@@ -1,0 +1,37 @@
+on:
+  schedule:
+      - cron: "20 2 * * *"
+  workflow_dispatch:
+  
+  name: catalog-updates
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      BSKY_PAT: ${{ secrets.BSKY_TOKEN }}
+    
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v4
+
+    - name: Set up R
+      uses: eddelbuettel/github-actions/r2u-setup@master
+
+    - name: Set up R packages
+      run: |
+        Rscript -e "install.packages(c('httr2', 'atrrr'))"
+    
+    - name: Check catalog and post to Bluesky
+      run: |
+        Rscript check_catalog.R
+      
+    - name: Commit record to repository
+      run: |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git add "data/n_digitized.csv"
+        git commit -m "[auto] Update N digitized $(TZ=America/New_York date +'%Y-%m-%d %H:%M')"
+        git push
+    
