@@ -21,7 +21,7 @@ jobs:
 
     - name: Set up R packages
       run: |
-        Rscript -e "install.packages(c('httr2', 'atrrr'))"
+        Rscript -e "install.packages(c('httr2', 'atrrr', 'jsonlite'))"
     
     - name: Check catalog and post to Bluesky
       run: |
