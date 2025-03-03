@@ -3,7 +3,7 @@ on:
       - cron: "20 2 * * *"
   workflow_dispatch:
   
-  name: catalog-updates
+name: catalog-update
 
 jobs:
   check:
