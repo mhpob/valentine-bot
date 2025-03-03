@@ -5,6 +5,9 @@ on:
   
 name: catalog-update
 
+permissions:
+  contents: write
+
 jobs:
   check:
     runs-on: ubuntu-latest
