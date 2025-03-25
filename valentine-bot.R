@@ -233,7 +233,17 @@ post_skeet(
       ""
     ),
     "\n",
-    item_url
+    item_url,
+    ifelse(
+      dir == "VALCOLL" &
+        grepl(
+          "garments|hats|gloves|underwear|sandals|dresses",
+          item_info$title,
+          ignore.case = TRUE
+        ),
+      " #FashionHistory",
+      ""
+    )
   ),
   image = image_info$url,
   image_alt = rep(item_info$description, times = nrow(image_info))
