@@ -237,7 +237,7 @@ post_skeet(
     ifelse(
       dir == "VALCOLL" &
         grepl(
-          "garments|hats|gloves|underwear|sandals|dresses",
+          "garments|hats|gloves|underwear|sandals|shoes|dresses",
           item_info$title,
           ignore.case = TRUE
         ),
