@@ -49,6 +49,10 @@ poll_catalog <- function(dir) {
 }
 
 
+post_log <- read.csv("post.log", header = F, col.names = c("time", "url", "status"))
+post_log$item <- gsub(".*ID=(.*)&db.*", '\\1', post_log$url)
+
+
 dir <- sample(c("VALCOLL", "VALARCH"), 1)
 catalog <- poll_catalog(dir)
 
@@ -74,6 +78,9 @@ cat("done.\n", length(catalog), "items found.\nSelecting item...\n")
 
 while (TRUE) {
   item <- sample(catalog, 1)
+  if (item %in% post_log$time) {
+    cat("Tried ", item, "; already posted.\n", sep = '')
+  } else {
   item_record <- "https://valentine.rediscoverysoftware.com/ProficioWcfServices/ProficioWcfService.svc/GetRecordDetails" |>
     request() |>
     req_body_json(
@@ -100,6 +107,8 @@ while (TRUE) {
     file_name = extract_tag(item_record, 'file_name')
   )
 
+  cat("Checking ", item_info$id, "for images...\n", sep = '')
+  
   image_check <- 'https://valentine.rediscoverysoftware.com/ProficioWcfServices/ProficioWcfService.svc/GetImagePaths' |>
     request() |>
     req_body_json(
@@ -113,7 +122,8 @@ while (TRUE) {
     resp_body_json() |>
     _$d
 
-  if (length(image_check >= 1)) break
+  if (length(image_check >= 1)) break else cat("  none found.\n")
+  }
 }
 
 
@@ -250,3 +260,26 @@ post_skeet(
 )
 
 cat("done.")
+
+
+
+# # Missing images can return NULL (length == 0) or be empty (length == 1, but empty)
+# if (length(image_check >= 1) & image_check$d != "") {
+#   # Sometimes images can have dead links, returning 404
+#   img_404s <- extract_tag(image_check |> read_html(), "fullimage") |>
+#     sapply(FUN = function(x) {
+#       paste0(
+#         "https://valentine.rediscoverysoftware.com/FullImages",
+#         x
+#       ) |>
+#         URLencode() |>
+#         request() |>
+#         req_error(is_error = \(resp) FALSE) |>
+#         req_perform() |>
+#         resp_is_error()
+#     })
+#   
+#   if(!any(img_404s)) break
+# }
+# }
+
