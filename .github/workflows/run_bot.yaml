@@ -42,4 +42,8 @@ jobs:
         
     - name: Commit log
       run: |
-        git add post.log && git commit -m "Update post.log"
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git add post.log
+        git commit -m "[auto] Update bot post log $(TZ=America/New_York date +'%Y-%m-%d %H:%M')"
+        git push
