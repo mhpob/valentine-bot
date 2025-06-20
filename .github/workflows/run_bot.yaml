@@ -5,6 +5,9 @@ on:
 
 name: post-skeet
 
+permissions:
+    contents: write
+
 jobs:
   post-skeet:
     runs-on: ubuntu-latest
